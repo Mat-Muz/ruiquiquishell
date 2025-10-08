@@ -1,5 +1,5 @@
 # Nom de l'exécutable
-EXEC_NAME = riquiiquishell
+EXEC_NAME = riquiquishell
 
 # Compilateur
 CC = gcc
