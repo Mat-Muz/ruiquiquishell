@@ -23,9 +23,10 @@ void exec(){
     int capa = 2;
     Prog.args = (string*)malloc(sizeof(string)* capa);
     string tempoarg = strtok(buff," ");
-    pid_t pid = fork();
+
     if (strcmp(tempoarg,"exit") == 0 )
     {
+        free(Prog.args);
         exit(0);
     }
     Prog.nbarg = 0;
@@ -54,19 +55,37 @@ void exec(){
     }
     Prog.args =temp;
     Prog.args[Prog.nbarg] = NULL;
+    if(Prog.nbarg == 2 && strcmp(Prog.args[0],"cd") == 0 ){
+        chdir(Prog.args[1]);
+        for (int i = 0; i < Prog.nbarg; i++) free(Prog.args[i]);
+        free(Prog.args);
+        return;
+    }
+    if(Prog.nbarg == 1 && strcmp(Prog.args[0], "pwd")==0){
+        
+        string cwd  = getcwd(NULL,0); //aloue tout seul a ala bonne taille
+        printf("%s \n", cwd);
+        free(cwd);
+        for (int i = 0; i < Prog.nbarg; i++) free(Prog.args[i]);
+        free(Prog.args);
+        return;
+    }
+    pid_t pid = fork();
     if (pid == -1)
     {
         perror("fork");
     }
     else if(pid == 0){
-         execvp(Prog.args[0], Prog.args);
-         perror("execvp"); 
-         exit(1);
+        execvp(Prog.args[0], Prog.args);
+        perror("execvp"); 
+        exit(1);
     }
     else{
         //daron
         int stat;
         waitpid(pid,&stat,0);
+        for (int i = 0; i < Prog.nbarg; i++) free(Prog.args[i]);
+        free(Prog.args);
     }
     
 }
