@@ -14,6 +14,12 @@ typedef struct{
 
 } Commande;
 
+typedef struct LComandes{
+    Commande  * curent;
+    struct LComandes * suiv;
+
+} List_Commandes;
+
 
 void exec(){
     char buff[512];
@@ -78,6 +84,8 @@ void exec(){
     else if(pid == 0){
         execvp(Prog.args[0], Prog.args);
         perror("execvp"); 
+        for (int i = 0; i < Prog.nbarg; i++) free(Prog.args[i]);
+        free(Prog.args);
         exit(1);
     }
     else{
@@ -99,5 +107,4 @@ int main(int argc, char ** argv){
     exec();
     }
     return 0;
-
 }
