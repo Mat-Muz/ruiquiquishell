@@ -3,97 +3,25 @@
 #include <string.h>
 #include <unistd.h>
 #include <sys/wait.h> 
-typedef char* string;
+#include "input.h"
+#include "main.h"
+#include "function.h"
 
-typedef struct{
+void a_line(){
+    string usertext = get_user_input();
+    List_Commandes * First = input_to_comands(usertext);
+    List_Commandes * Elem = First;
 
-    string cmd;
-    int nbarg; //avec commande sans null
-    string * args; //tableau de string commande + NULL
-
-
-} Commande;
-
-typedef struct LComandes{
-    Commande  * curent;
-    struct LComandes * suiv;
-
-} List_Commandes;
-
-
-void exec(){
-    char buff[512];
-    fgets(buff,sizeof(buff),stdin);
-    buff[strcspn(buff, "\n")] = '\0'; //Clean
-    Commande Prog;
-    int capa = 2;
-    Prog.args = (string*)malloc(sizeof(string)* capa);
-    string tempoarg = strtok(buff," ");
-
-    if (strcmp(tempoarg,"exit") == 0 )
+    while (Elem != NULL)
     {
-        free(Prog.args);
-        exit(0);
-    }
-    Prog.nbarg = 0;
-    while(tempoarg != NULL){
-        if(Prog.nbarg > capa){ //on va doubler a chaque fois pour eviter de faire trop de realloc (les mec sur stack overflow il ont dit c'est ça quil daut faire)
-            capa = capa*2;
-            string * temp = realloc(Prog.args,sizeof(string)*capa);
-            if(temp == NULL){
-                perror("realloc");
-                for (int i = 0; i < Prog.nbarg; i++) free(Prog.args[i]);
-                free(Prog.args);
-                return;
-            }
-            Prog.args =temp;
+        Commande * current = Elem->curent;
+        int background = 0;
+        if(builtin(First, current) == 1 ){
+            Elem = Elem->suiv;
+            continue;
         }
-        Prog.args[Prog.nbarg] = strdup(tempoarg);
-        Prog.nbarg++;
-        tempoarg = strtok(NULL," ");
-    }
-    string * temp = realloc(Prog.args,sizeof(string)*(Prog.nbarg+1));
-    if(temp == NULL){
-        perror("realloc");
-        for (int i = 0; i < Prog.nbarg; i++) free(Prog.args[i]);
-        free(Prog.args);
-        return;       
-    }
-    Prog.args =temp;
-    Prog.args[Prog.nbarg] = NULL;
-    if(Prog.nbarg == 2 && strcmp(Prog.args[0],"cd") == 0 ){
-        chdir(Prog.args[1]);
-        for (int i = 0; i < Prog.nbarg; i++) free(Prog.args[i]);
-        free(Prog.args);
-        return;
-    }
-    if(Prog.nbarg == 1 && strcmp(Prog.args[0], "pwd")==0){
-        
-        string cwd  = getcwd(NULL,0); //aloue tout seul a ala bonne taille
-        printf("%s \n", cwd);
-        free(cwd);
-        for (int i = 0; i < Prog.nbarg; i++) free(Prog.args[i]);
-        free(Prog.args);
-        return;
-    }
-    pid_t pid = fork();
-    if (pid == -1)
-    {
-        perror("fork");
-    }
-    else if(pid == 0){
-        execvp(Prog.args[0], Prog.args);
-        perror("execvp"); 
-        for (int i = 0; i < Prog.nbarg; i++) free(Prog.args[i]);
-        free(Prog.args);
-        exit(1);
-    }
-    else{
-        //daron
-        int stat;
-        waitpid(pid,&stat,0);
-        for (int i = 0; i < Prog.nbarg; i++) free(Prog.args[i]);
-        free(Prog.args);
+        normal_command(current, background);
+        Elem = Elem->suiv;
     }
     
 }
@@ -104,7 +32,7 @@ void exec(){
 int main(int argc, char ** argv){
     while(1){
     printf("$");
-    exec();
+    a_line();
     }
     return 0;
 }

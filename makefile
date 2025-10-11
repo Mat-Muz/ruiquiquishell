@@ -13,7 +13,7 @@ LDFLAG =
 
 # Dossiers
 SRC_DIR = ./src
-INC_DIR = ./include
+INC_DIR = ./Include
 BIN_DIR = ./bin
 BUILD_DIR = ./build
 
