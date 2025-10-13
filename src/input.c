@@ -9,7 +9,7 @@ char * get_user_input(){
     if(buff == NULL){
         perror("malloc error in get_user_input");
     }
-    fgets(buff,sizeof(buff),stdin);
+    fgets(buff,512,stdin);
     buff[strcspn(buff, "\n")] = '\0'; 
     return buff;
 }
@@ -18,7 +18,7 @@ List_Commandes *  input_to_comands( char * userinput){
     List_Commandes * Coms = (List_Commandes *) malloc(sizeof(List_Commandes));
     if(Coms == NULL ){
         perror("malloc error in input_to_commands");
-        return NULL;
+        return NULL;          
     }
     
 
@@ -57,7 +57,12 @@ List_Commandes *  input_to_comands( char * userinput){
     }
     Prog->args =temp;
     Prog->args[Prog->nbarg] = NULL;
-
+    if(Prog->nbarg == 0){
+        free(Prog->args);
+        free(Prog);
+        free(Coms);
+        Coms = NULL;
+    }
     return Coms;
 
 }
