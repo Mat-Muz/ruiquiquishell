@@ -33,6 +33,10 @@ void normal_command(Commande * currentprog) {
         perror("fork");
     } else if (pid == 0) {
         //enfant
+
+        if (currentprog->redirect_file != NULL) { //Redirection cas du >
+            freopen(currentprog->redirect_file, "w", stdout);
+        }
         execvp(currentprog->args[0], currentprog->args);
         perror("execvp");
         Clean_All(&Global_Vars, 1);

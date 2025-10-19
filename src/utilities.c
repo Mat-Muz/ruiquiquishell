@@ -21,6 +21,10 @@ void Clean_List_Commandes(List_Commandes * First){
                 free(com_tofree->args);
                 com_tofree->args = NULL;
             }
+            if (com_tofree->redirect_file != NULL) {
+                free(com_tofree->redirect_file);
+                com_tofree->redirect_file = NULL;
+            }
             free(com_tofree);
             com_tofree = NULL;
         }
@@ -46,6 +50,7 @@ void Clean_All(Important_stuff * Vars, int clean_cwd){
         free(Vars->cwd);
         Vars->cwd = NULL;
     }
+
 }
 
 void current_directory_update(Important_stuff * Vars){
@@ -55,3 +60,4 @@ void current_directory_update(Important_stuff * Vars){
     }
     Vars->cwd = getcwd(NULL,0);
 }
+

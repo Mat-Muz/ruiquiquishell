@@ -16,9 +16,9 @@ void handle_sigchld(int sig) {
     int status;
     pid_t pid;
 
-    
+
     // nettoie tous les processus enfants terminés
-    while ((pid = waitpid(-1, &status, WNOHANG)) > 0) {
+    while ((pid = waitpid(-1, &status, WNOHANG)) > 0) { //WNOHANG pour ne pas bloquer si pas d'enfant terminé
         printf("\n enfant %d fini.\n", pid);
     }
 }

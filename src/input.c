@@ -50,8 +50,29 @@ List_Commandes * parse_unecommande(string unecomande){
     Prog->args = (string*)malloc(sizeof(string)* capa);
     Prog->nbarg = 0;
     
+
+    /*Detection de > pour redirection fichier*/
+    char * redir_pos = strchr(unecomande, '>');
+    if (redir_pos != NULL) {
+        *redir_pos = '\0'; // Terminer la commande avant '>'
+        redir_pos++;
+        while (*redir_pos == ' ') redir_pos++; // Ignorer les espaces pour nom du fichier
+        char * end_pos = strpbrk(redir_pos, " "); // Trouver la fin du nom du fichier
+        if (end_pos != NULL) {
+            *end_pos = '\0'; 
+        }
+        Prog->redirect_file = strdup(redir_pos); // Copier le nom du fichier
+    } else {
+        Prog->redirect_file = NULL; // Pas de redirection
+    }
+
+
+
     char * saveptr1;
     string tempoarg = strtok_r(unecomande," ", &saveptr1); //strtok_r pour eviter les problme de strtok imbrqué
+
+
+
     while(tempoarg != NULL){
         if(Prog->nbarg >= capa){ //on va doubler a chaque fois pour eviter de faire trop de realloc (les mec sur stack overflow il ont dit c'est ça quil daut faire)
             capa = capa*2;

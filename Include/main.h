@@ -12,6 +12,7 @@ typedef struct{
     int nbarg; //avec commande sans null
     string * args; //tableau de string commande + NULL
     int background; //c"est pour le &
+    string redirect_file; //ficher a la place de stdout
 
 
 } Commande;
