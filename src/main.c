@@ -11,6 +11,19 @@
 
 Important_stuff Global_Vars;
 
+void handle_sigchld(int sig) {
+    (void)sig; // stop warning
+    int status;
+    pid_t pid;
+
+    
+    // nettoie tous les processus enfants terminés
+    while ((pid = waitpid(-1, &status, WNOHANG)) > 0) {
+        printf("\n enfant %d fini.\n", pid);
+    }
+}
+
+
 void a_line(){
     Global_Vars.usertext = get_user_input();
     Global_Vars.First = input_to_comands(Global_Vars.usertext);
@@ -31,13 +44,18 @@ void a_line(){
 
 
 
-
 int main(int argc, char ** argv){
     Global_Vars.usertext = NULL;
     Global_Vars.First = NULL;
     current_directory_update(&Global_Vars);
+
+    struct sigaction sa;
+    sa.sa_handler = handle_sigchld;
+    sa.sa_flags = SA_RESTART | SA_NOCLDSTOP; //C'est les flags de stackoverflow pour un child handler (ne pas toucher)
+    sigaction(SIGCHLD, &sa, NULL);
+
     while(1){
-    printf("%s$ ",Global_Vars.cwd);
+    printf("(%s) $ ",Global_Vars.cwd);
     a_line();
     }
     Clean_All(&Global_Vars, 1);

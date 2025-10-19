@@ -27,25 +27,24 @@ int builtin(Commande * currentprog){
     return 0;
 }
 
-void normal_command(Commande * currentprog){
-
+void normal_command(Commande * currentprog) {
     pid_t pid = fork();
-    if (pid == -1)
-    {
+    if (pid == -1) {
         perror("fork");
-    }
-    else if(pid == 0){
+    } else if (pid == 0) {
+        //enfant
         execvp(currentprog->args[0], currentprog->args);
-        perror("execvp"); 
+        perror("execvp");
         Clean_All(&Global_Vars, 1);
         exit(1);
         
-    }
-    else{
-        //daron
-        int stat;
-        if(currentprog->background == 0){
-        waitpid(pid,&stat,0);
+    } else {
+        //parent
+        if (currentprog->background == 0) {
+            int stat;
+            waitpid(pid, &stat, 0);
+        } else {
+            printf("%d\n", pid);
         }
     }
 }
