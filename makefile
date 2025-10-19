@@ -5,7 +5,7 @@ EXEC_NAME = riquiquishell
 CC = gcc
 
 # Flags GCC standards
-CFLAGS = -Wall -Wextra -pedantic -g -I$(INC_DIR) -MMD -MP
+CFLAGS = -Wall -Wextra -pedantic -g -I$(INC_DIR) -MMD -MP -O0
 
 # Flags des bibliotheques standard et externe
 LIBFLAG =

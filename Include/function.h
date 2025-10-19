@@ -2,10 +2,11 @@
 #define FUCTION_H
 
 #include "main.h"
+#include "utilities.h"
 
-int builtin(List_Commandes * First, Commande * currentprog);
+int builtin(Commande * currentprog);
 
-void normal_command(Commande * currentprog, int background);
+void normal_command(Commande * currentprog);
 
 
 
