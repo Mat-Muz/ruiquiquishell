@@ -8,4 +8,7 @@ void Clean_All(Important_stuff * Vars, int clean_cwd);
 
 void current_directory_update(Important_stuff * Vars);
 
+string check_plusgrand(string text);
+
+
 #endif

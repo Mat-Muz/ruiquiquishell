@@ -1,4 +1,5 @@
 #include "input.h"
+#include "utilities.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -51,22 +52,8 @@ List_Commandes * parse_unecommande(string unecomande){
     Prog->nbarg = 0;
     
 
-    /*Detection de > pour redirection fichier*/
-    char * redir_pos = strchr(unecomande, '>');
-    if (redir_pos != NULL) {
-        *redir_pos = '\0'; // Terminer la commande avant '>'
-        redir_pos++;
-        while (*redir_pos == ' ') redir_pos++; // Ignorer les espaces pour nom du fichier
-        char * end_pos = strpbrk(redir_pos, " "); // Trouver la fin du nom du fichier
-        if (end_pos != NULL) {
-            *end_pos = '\0'; 
-        }
-        Prog->redirect_file = strdup(redir_pos); // Copier le nom du fichier
-    } else {
-        Prog->redirect_file = NULL; // Pas de redirection
-    }
 
-
+    Prog->redirect_file = check_plusgrand(unecomande);
 
     char * saveptr1;
     string tempoarg = strtok_r(unecomande," ", &saveptr1); //strtok_r pour eviter les problme de strtok imbrqué
@@ -112,8 +99,11 @@ List_Commandes * parse_unecommande(string unecomande){
 
 
 List_Commandes *  input_to_comands( char * userinput){
+    /*
+    input_to_command seppare le userinput en sous commandes graces aux ;
+    */
+
     List_Commandes * First = NULL;
-    //séparer les ;
     char * saveptr2;
     string unecomande = strtok_r(userinput,";", &saveptr2); //strtok_r pour eviter les problme de strtok imbrqué
     if(unecomande == NULL){
@@ -135,7 +125,3 @@ List_Commandes *  input_to_comands( char * userinput){
     return First;
 
 }
-
-
-
-

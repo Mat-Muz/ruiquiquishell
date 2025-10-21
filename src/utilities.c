@@ -61,3 +61,20 @@ void current_directory_update(Important_stuff * Vars){
     Vars->cwd = getcwd(NULL,0);
 }
 
+string check_plusgrand(string text){
+        /*Detection de > pour redirection fichier*/
+
+    char * redir_pos = strchr(text, '>');
+    if (redir_pos != NULL) {
+        *redir_pos = '\0'; // Terminer la commande avant '>'
+        redir_pos++;
+        while (*redir_pos == ' ') redir_pos++; // Ignorer les espaces pour nom du fichier
+        char * end_pos = strpbrk(redir_pos, " "); // Trouver la fin du nom du fichier
+        if (end_pos != NULL) {
+            *end_pos = '\0'; 
+        }
+        return strdup(redir_pos); // Copier le nom du fichier
+    } else {
+        return NULL; // Pas de redirection
+    }
+}
