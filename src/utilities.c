@@ -2,7 +2,9 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <string.h>
+#include <fcntl.h>
 #include "utilities.h"
+
 
 
 
@@ -20,10 +22,6 @@ void Clean_List_Commandes(List_Commandes * First){
                 }
                 free(com_tofree->args);
                 com_tofree->args = NULL;
-            }
-            if (com_tofree->redirect_file != NULL) {
-                free(com_tofree->redirect_file);
-                com_tofree->redirect_file = NULL;
             }
             free(com_tofree);
             com_tofree = NULL;
@@ -61,7 +59,7 @@ void current_directory_update(Important_stuff * Vars){
     Vars->cwd = getcwd(NULL,0);
 }
 
-string check_plusgrand(string text){
+int check_plusgrand(string text){
         /*Detection de > pour redirection fichier*/
 
     char * redir_pos = strchr(text, '>');
@@ -73,8 +71,31 @@ string check_plusgrand(string text){
         if (end_pos != NULL) {
             *end_pos = '\0'; 
         }
-        return strdup(redir_pos); // Copier le nom du fichier
+        return open(redir_pos, O_CREAT | O_WRONLY | O_TRUNC, 0644); // Ouvrir le fichier en écriture    
     } else {
-        return NULL; // Pas de redirection
+        return -1; // Pas de redirection
     }
+}
+
+
+void close_fds(Commande * Prog){
+    if(Prog->fd_in != -1){
+        close(Prog->fd_in);
+        Prog->fd_in = -1;
+    }
+    if(Prog->fd_out != -1){
+        close(Prog->fd_out);
+        Prog->fd_out = -1;
+    }
+}
+
+
+void init_Prog(Commande * Prog){
+    //initialisation de la structure commande
+    Prog->cmd = NULL;
+    Prog->nbarg = 0;
+    Prog->args = NULL;
+    Prog->background = 0;
+    Prog->fd_in = -1;
+    Prog->fd_out = -1;
 }

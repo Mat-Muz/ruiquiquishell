@@ -26,7 +26,7 @@ void handle_sigchld(int sig) {
 
 void a_line(){
     Global_Vars.usertext = get_user_input();
-    Global_Vars.First = input_to_comands(Global_Vars.usertext);
+    Global_Vars.First = input_to_comands_semi(Global_Vars.usertext);
     List_Commandes * Elem = Global_Vars.First;
 
     while (Elem != NULL)

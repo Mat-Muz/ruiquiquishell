@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 
 
 char * get_user_input(){
@@ -46,6 +47,12 @@ List_Commandes * parse_unecommande(string unecomande){
     Coms->suiv = NULL;
     Coms->curent = (Commande * )malloc(sizeof(Commande));
     Commande  * Prog = Coms->curent;
+    if(Prog == NULL ){
+        perror("malloc error in input_to_commands");
+        free(Coms);
+        return NULL;          
+    }
+    init_Prog(Prog);
     
     int capa = 2;
     Prog->args = (string*)malloc(sizeof(string)* capa);
@@ -53,7 +60,7 @@ List_Commandes * parse_unecommande(string unecomande){
     
 
 
-    Prog->redirect_file = check_plusgrand(unecomande);
+    Prog->fd_out = check_plusgrand(unecomande);
 
     char * saveptr1;
     string tempoarg = strtok_r(unecomande," ", &saveptr1); //strtok_r pour eviter les problme de strtok imbrqué
@@ -98,14 +105,43 @@ List_Commandes * parse_unecommande(string unecomande){
 }
 
 
-List_Commandes *  input_to_comands( char * userinput){
+List_Commandes *  input_to_comands_semi( char * userinput){
     /*
     input_to_command seppare le userinput en sous commandes graces aux ;
-    */
 
+    */
     List_Commandes * First = NULL;
     char * saveptr2;
     string unecomande = strtok_r(userinput,";", &saveptr2); //strtok_r pour eviter les problme de strtok imbrqué
+    if(unecomande == NULL){
+        return NULL;
+    }
+    First = input_to_commands_pipe(unecomande);
+    if(First == NULL){
+        return NULL;
+    }
+    List_Commandes * Elem = First;
+    while ((unecomande = strtok_r(NULL,";", &saveptr2)) != NULL)
+    {
+        Elem->suiv = input_to_commands_pipe(unecomande);
+        if(Elem->suiv == NULL){
+            break;
+        }        
+        Elem = Elem->suiv;
+    }
+    return First;
+}
+
+
+
+List_Commandes * input_to_commands_pipe( string userinput){
+    /*
+    input_to_command seppare le userinput en sous commandes graces aux |
+    et affecte les fd_in et fd_out correctement
+    */
+    List_Commandes * First = NULL;
+    char * saveptr2;
+    string unecomande = strtok_r(userinput,"|", &saveptr2); //strtok_r pour eviter les problme de strtok imbrqué
     if(unecomande == NULL){
         return NULL;
     }
@@ -114,14 +150,24 @@ List_Commandes *  input_to_comands( char * userinput){
         return NULL;
     }
     List_Commandes * Elem = First;
-    while ((unecomande = strtok_r(NULL,";", &saveptr2)) != NULL)
+    Commande * prev = Elem->curent;
+    while ((unecomande = strtok_r(NULL,"|", &saveptr2)) != NULL)
     {
         Elem->suiv = parse_unecommande(unecomande);
         if(Elem->suiv == NULL){
             break;
         }        
+        //Création du pipe entre prev et Elem->suiv
+        int pipefd[2];
+        if (pipe(pipefd) == -1) {
+            perror("pipe");
+            break;
+        }
+        prev->fd_out = pipefd[1]; //ecriture
+        Elem->suiv->curent->fd_in = pipefd[0]; //lecture
+
+        prev = Elem->suiv->curent;
         Elem = Elem->suiv;
     }
     return First;
-
 }

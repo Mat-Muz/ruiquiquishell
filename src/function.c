@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <sys/wait.h> 
+#include <fcntl.h>
 
 int builtin(Commande * currentprog){
     
@@ -34,9 +35,19 @@ void normal_command(Commande * currentprog) {
     } else if (pid == 0) {
         //enfant
 
-        if (currentprog->redirect_file != NULL) { //Redirection cas du >
-            freopen(currentprog->redirect_file, "w", stdout);
+        if (currentprog->fd_out != -1) { 
+            if (dup2(currentprog->fd_out, STDOUT_FILENO) == -1) { //fd ou pipe[1]
+            perror("dup2");
+            _exit(1);
+            }
         }
+        if (currentprog->fd_in != -1) { 
+            if (dup2(currentprog->fd_in, STDIN_FILENO) == -1) { //fd ou pipe[0]
+            perror("dup2");
+            _exit(1);
+            }
+        }
+        close_fds(currentprog);
         execvp(currentprog->args[0], currentprog->args);
         perror("execvp");
         Clean_All(&Global_Vars, 1);
@@ -44,6 +55,8 @@ void normal_command(Commande * currentprog) {
         
     } else {
         //parent
+        close_fds(currentprog);
+
         if (currentprog->background == 0) {
             int stat;
             waitpid(pid, &stat, 0);
