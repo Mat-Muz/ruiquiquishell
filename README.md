@@ -40,6 +40,10 @@ RiquiquiShell est un projet de shell minimaliste écrit en C. Il permet d'exécu
   - `pwd` : Affiche le répertoire courant.
   - `exit` : Quitte le shell.
 
+## BUGS
+
+- ne pas utiliser le `|` avec le `&`
+
 ## Compilation et exécution
 
 ### Prérequis
