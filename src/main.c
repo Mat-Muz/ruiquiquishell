@@ -25,10 +25,8 @@ void handle_sigchld(int sig) {
 
 
 void a_line(){
-    Global_Vars.usertext = get_user_input();
     Global_Vars.First = input_to_comands_semi(Global_Vars.usertext);
     List_Commandes * Elem = Global_Vars.First;
-
     while (Elem != NULL)
     {
         Commande * current = Elem->curent;
@@ -44,20 +42,28 @@ void a_line(){
 
 
 
-int main(int argc, char ** argv){
+int main(int argc, char **argv) {
     Global_Vars.usertext = NULL;
     Global_Vars.First = NULL;
     current_directory_update(&Global_Vars);
 
     struct sigaction sa;
     sa.sa_handler = handle_sigchld;
-    sa.sa_flags = SA_RESTART | SA_NOCLDSTOP; //C'est les flags de stackoverflow pour un child handler (ne pas toucher)
+    sa.sa_flags = SA_RESTART | SA_NOCLDSTOP;
     sigaction(SIGCHLD, &sa, NULL);
 
-    while(1){
-    printf("(%s) $ ",Global_Vars.cwd);
-    a_line();
+    while (1) {
+        printf("(%s) $ ", Global_Vars.cwd);
+        fflush(stdout);
+
+        Global_Vars.usertext = get_user_input();
+        if (Global_Vars.usertext == NULL) {
+            printf("\n");
+            break; //on quitte si EOF comme dans terminal
+        }
+        a_line();
     }
+
     Clean_All(&Global_Vars, 1);
     return 0;
 }

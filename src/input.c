@@ -11,8 +11,11 @@ char * get_user_input(){
     if(buff == NULL){
         perror("malloc error in get_user_input");
     }
-    fgets(buff,512,stdin);
-    buff[strcspn(buff, "\n")] = '\0'; 
+    if(fgets(buff,512,stdin) == NULL){ //EOF
+        free(buff);
+        return NULL;
+    };
+    buff[strcspn(buff, "\n\r")] = '\0'; 
     return buff;
 }
 
@@ -110,6 +113,8 @@ List_Commandes *  input_to_comands_semi( char * userinput){
     input_to_command seppare le userinput en sous commandes graces aux ;
 
     */
+    if (userinput == NULL) return NULL;
+    
     List_Commandes * First = NULL;
     char * saveptr2;
     string unecomande = strtok_r(userinput,";", &saveptr2); //strtok_r pour eviter les problme de strtok imbrqué
