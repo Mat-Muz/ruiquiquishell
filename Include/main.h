@@ -7,9 +7,7 @@ typedef char* string;
 
 
 typedef struct{
-
-    string cmd;
-    int nbarg; //avec commande sans null
+    int nbarg; //indice du dernier elem
     string * args; //tableau de string commande + NULL
     int background; //c"est pour le &
     int fd_out; //ficher a la place de stdout fd

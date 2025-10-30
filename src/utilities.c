@@ -92,7 +92,6 @@ void close_fds(Commande * Prog){
 
 void init_Prog(Commande * Prog){
     //initialisation de la structure commande
-    Prog->cmd = NULL;
     Prog->nbarg = 0;
     Prog->args = NULL;
     Prog->background = 0;
