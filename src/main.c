@@ -12,14 +12,19 @@
 Important_stuff Global_Vars;
 
 void handle_sigchld(int sig) {
-    (void)sig; // stop warning
+    (void)sig; // sto warning
     int status;
     pid_t pid;
 
+    // enfant en bg
+    while ((pid = waitpid(-1, &status, WNOHANG)) > 0) {
+        printf("\n[%d] terminé.\n", pid);
+    }
 
-    // nettoie tous les processus enfants terminés
-    while ((pid = waitpid(-1, &status, WNOHANG)) > 0) { //WNOHANG pour ne pas bloquer si pas d'enfant terminé
-        printf("\n enfant %d fini.\n", pid);
+    // pour eviter le double prompt et afficher le prompt sinon 
+    if (Global_Vars.fg == 0 && Global_Vars.cwd != NULL) {
+        printf("(%s) $ ", Global_Vars.cwd);
+        fflush(stdout);
     }
 }
 
@@ -45,6 +50,7 @@ void a_line(){
 int main(int argc, char **argv) {
     Global_Vars.usertext = NULL;
     Global_Vars.First = NULL;
+    Global_Vars.fg = 0;
     current_directory_update(&Global_Vars);
 
     struct sigaction sa;
@@ -59,7 +65,7 @@ int main(int argc, char **argv) {
         Global_Vars.usertext = get_user_input();
         if (Global_Vars.usertext == NULL) {
             printf("\n");
-            break; //on quitte si EOF comme dans terminal
+            break; //on quitte si EOF comme dans bash
         }
         a_line();
     }

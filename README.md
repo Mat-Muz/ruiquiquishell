@@ -1,6 +1,6 @@
 # RiquiquiShell
 
-RiquiquiShell est un projet de shell minimaliste écrit en C. Il permet d'exécuter des commandes système, de gérer des redirections, des pipes, et des commandes en arrière-plan.
+RiquiquiShell est un projet de shell écrit en C. Il permet d'exécuter des commandes système, de gérer des redirections, des pipes, et des commandes en arrière-plan.
 
 ## Structure du projet
 
@@ -24,8 +24,8 @@ RiquiquiShell est un projet de shell minimaliste écrit en C. Il permet d'exécu
 
 ### Répertoires principaux
 
-- **Include/** : Contient les fichiers d'en-tête (`.h`) pour les différentes fonctionnalités du projet.
-- **src/** : Contient les fichiers source (`.c`) implémentant les fonctionnalités.
+- **Include/** : Contient les fichiers d'en-tête (`.h`)
+- **src/** : Contient les fichiers source (`.c`)
 - **bin/** : Contiendra l'exécutable généré après compilation.
 - **build/** : Contiendra les fichiers objets (`.o`) générés lors de la compilation.
 

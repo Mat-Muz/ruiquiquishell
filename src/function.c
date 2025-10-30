@@ -21,7 +21,7 @@ int builtin(Commande * currentprog){
     }
     if(currentprog->nbarg == 1 && strcmp(currentprog->args[0], "pwd")==0){
         
-        string cwd  = Global_Vars.cwd; //aloue tout seul a ala bonne taille
+        string cwd  = Global_Vars.cwd;
         printf("%s \n", cwd);
         return 1;
     }
@@ -58,10 +58,12 @@ void normal_command(Commande * currentprog) {
         close_fds(currentprog);
 
         if (currentprog->background == 0) {
+            Global_Vars.fg = 1;
             int stat;
             waitpid(pid, &stat, 0);
         } else {
-            printf("%d\n", pid);
+            printf("[%d]\n", pid);
         }
+        Global_Vars.fg = 0;
     }
 }

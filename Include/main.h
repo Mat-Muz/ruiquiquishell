@@ -31,6 +31,7 @@ typedef struct {
     string usertext;
     List_Commandes * First;
     string cwd; 
+    int fg;  //pour eviter de réafficher le prompt au mileu d'une execution de commande en fg
 
 }Important_stuff; //plus simple a free car variable golbale
 
